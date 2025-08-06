@@ -1,8 +1,8 @@
 #include "systemcalls.h"
+#include <fcntl.h>
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <fcntl.h>
 
 /**
  * @param cmd the command to execute with system()
@@ -63,18 +63,20 @@ bool do_exec(int count, ...) {
      *   as second argument to the execv() command.
      *
      */
+    va_end(args);
     int pid = fork();
+    if (pid < 0)
+        return false;
     if (pid == 0) {
-        // child
-        execv(command[0], &command[1]);
-        exit(1); // we only execute this if execv failed
+        execv(command[0], command);
+        exit(1);
     } else {
-        int status;
+        int status = 0;
         waitpid(pid, &status, 0);
-
-        va_end(args);
-
-        return WIFEXITED(status) ? true : false;
+        if (WIFEXITED(status)) {
+            return WEXITSTATUS(status) == 0;
+        }
+        return false;
     }
 }
 
@@ -104,27 +106,24 @@ bool do_exec_redirect(const char *outputfile, int count, ...) {
      * behaviour is same as do_exec()
      *
      */
-    int fd = open(outputfile, O_WRONLY | O_TRUNC | O_CREAT, 0644);
-    if (fd < 0)
-        return false;
+    va_end(args);
     int pid = fork();
-    switch (pid) {
-    case -1:
+    if (pid < 0)
         return false;
-    case 0: 
-        if (dup2(fd, 1) < 0) {
+    if (pid == 0) {
+        int fd = open(outputfile, O_WRONLY | O_TRUNC | O_CREAT, 0666);
+        if (fd < 0 || dup2(fd, 1) < 0) {
             exit(1);
         }
-        execv(command[0], &command[1]);
-        exit(1);
-    default:
         close(fd);
-        int status;
+        execv(command[0], command);
+        exit(1);
+    } else {
+        int status = 0;
         waitpid(pid, &status, 0);
-        return WIFEXITED(status) ? true : false;
+        if (WIFEXITED(status)) {
+            return WEXITSTATUS(status) == 0;
+        }
+        return false;
     }
-
-    va_end(args);
-
-    return true;
 }
