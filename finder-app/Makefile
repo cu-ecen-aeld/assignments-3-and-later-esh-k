@@ -3,7 +3,7 @@ LDFLAGS := -Llib
 LDLIBS := -lm
 
 CROSS_COMPILE := 
-CC := $(CROSS_COMPILE)gcc
+CC := $(CROSS_COMPILE)$(CC)
 
 ALL: writer
 
