@@ -1,3 +1,4 @@
+#!/bin/sh
 if [ $# -ne 2 ]; then
   echo "expected 2 args"
   exit 1
