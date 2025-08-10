@@ -3,11 +3,11 @@ LDFLAGS := -Llib
 LDLIBS := -lm
 
 CROSS_COMPILE := 
-CC := $(CROSS_COMPILE)$(CC)
+# CC := $(CROSS_COMPILE)gcc
 
-ALL: writer
+all: writer
 
-.PHONY: ALL
+.PHONY: all
 
 writer: writer.o
 	$(CC) $(LDFLAGS) $? $(LDLIBS) -o $@
