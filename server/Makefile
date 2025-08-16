@@ -1,9 +1,10 @@
-CFLAGS := -Wall
-LDFLAGS := -Llib
-LDLIBS := -lm
-CC ?= $(TARGET_CC)
+CFLAGS ?= -Wall
+LDFLAGS ?= -lpthread -lrt -Llib
+LDLIBS ?= -lm
+CC ?= $(CROSS_COMPILE)gcc
+TARGET ?= aesdsocket
 
-all: aesdsocket
+all: $(TARGET)
 
 default: all
 
