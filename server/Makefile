@@ -1,6 +1,7 @@
 CFLAGS := -Wall
 LDFLAGS := -Llib
 LDLIBS := -lm
+CC ?= $(TARGET_CC)
 
 all: aesdsocket
 
